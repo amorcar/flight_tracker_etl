@@ -1,7 +1,6 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-print(sys.path)
 from typing import Tuple, Counter, List
 from prefect import task
 from prefect.tasks.database.sqlite import SQLiteScript, SQLiteQuery
@@ -71,7 +70,8 @@ def get_raw_states_from_api() -> Tuple:
     lamax, lomax = 41.20628875958395, -72.98751255641236
     lamin, lomin = 40.47989847518386, -74.584242519867
 
-    return get_flights_in_roi(lamax, lomax, lamin, lomin)
+    api_data = get_flights_in_roi(lamax, lomax, lamin, lomin)
+    return  api_data
 
 
 @task
@@ -81,7 +81,8 @@ def store_raw_states(raw_states: List, db: str):
 
 @task
 def parse_raw_states(raw_states: List) -> Tuple[FlightState]:
-    return parse_flight_states(raw_states)
+    parsed_data = parse_flight_states(raw_states)
+    return parsed_data
 
 
 @task

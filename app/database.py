@@ -10,7 +10,7 @@ from opensky import FlightState
 # sqlite3.register_converter("BOOLEAN", lambda v: bool(int(v)))
 
 
-def create_raw_state_table(db: str):
+def create_raw_state_table(db):
     '''
     Create a Raw State Table in the SQLite DB if it does not exits already.
     '''
@@ -38,7 +38,7 @@ def create_raw_state_table(db: str):
             cursor.execute(script)
             conn.commit()
 
-def create_parsed_state_table(db: str):
+def create_parsed_state_table(db):
     '''
     Create a Parsed State Table in the SQLite DB if it does not exits already.
     '''
@@ -56,7 +56,7 @@ def create_parsed_state_table(db: str):
             cursor.execute(script)
             conn.commit()
 
-def insert_raw_states_in_db(db: str, _raw_states):
+def insert_raw_states_in_db(db, _raw_states):
     script = 'INSERT INTO raw_state VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,\
             ?, ?, ?, ?, ?)'
 
@@ -73,7 +73,7 @@ def insert_raw_states_in_db(db: str, _raw_states):
             conn.commit()
 
 
-def insert_parsed_states_in_db(db: str, parsed_states):
+def insert_parsed_states_in_db(db, parsed_states):
     script = 'INSERT INTO state VALUES (?, ?, ?, ?, ?, ?)'
 
     with closing(sqlite3.connect(db)) as conn:
@@ -81,7 +81,7 @@ def insert_parsed_states_in_db(db: str, parsed_states):
             cursor.executemany(script, map(tuple, parsed_states))
             conn.commit()
 
-def get_raw_states_from_db(db: str) -> List:
+def get_raw_states_from_db(db):
     script = 'SELECT * FROM raw_state'
 
     with closing(sqlite3.connect(db)) as conn:
@@ -91,7 +91,7 @@ def get_raw_states_from_db(db: str) -> List:
 
     return raw_states
 
-def get_parsed_states_from_db(db: str) -> List[FlightState]:
+def get_parsed_states_from_db(db):
     script = 'SELECT * FROM state'
 
     with closing(sqlite3.connect(db)) as conn:
@@ -101,7 +101,7 @@ def get_parsed_states_from_db(db: str) -> List[FlightState]:
 
     flight_states =  [FlightState(*state) for state in states]
 
-    def convert_to_bools(state: FlightState):
+    def convert_to_bools(state):
         values = list(state)
         #TODO: This is reallly awful, improve
         bool_indices = (3, 4)

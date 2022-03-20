@@ -79,7 +79,6 @@ def parse_flight_states(states: List) -> List[FlightState]:
     Parse the flight state list to a list of FlightState objects.
     '''
     parsed_states = []
-    breakpoint()
     for state in states:
         parsed_state = FlightState.from_state_list(state)
         parsed_states.append(parsed_state)
