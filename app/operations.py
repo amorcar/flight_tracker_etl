@@ -15,11 +15,11 @@ def filter_duplicated_states(
     def icao24_code_already_exist_condition(state: FlightState) -> bool:
         return state.icao24 in current_stored_icao24_codes
 
-    def last_update_more_than_one_day_ago_condition(
+    def last_update_more_than_one_hour_ago_condition(
             state: FlightState,
             target_icao24: str
     ) -> bool:
-        delta = timedelta(days=1)
+        delta = timedelta(hours=1)
         stored_timestamp = [
             *filter(lambda s: s.icao24 == target_icao24, stored_states)
         ][0].last_contact
@@ -31,7 +31,7 @@ def filter_duplicated_states(
         target_icao24 = state.icao24
         first_filter = icao24_code_already_exist_condition(state)
         if not first_filter: return False
-        second_filter = last_update_more_than_one_day_ago_condition(state, target_icao24)
+        second_filter = last_update_more_than_one_hour_ago_condition(state, target_icao24)
         return first_filter and second_filter
 
     filtered_states = filter(apply_filter, new_states)

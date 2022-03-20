@@ -21,7 +21,7 @@ from dataflow.tasks import (
 )
 
 
-schedule_etl = IntervalSchedule(interval=timedelta(minutes=1))
+schedule_etl = IntervalSchedule(interval=timedelta(minutes=15))
 with Flow('API_TRANSFORM_STORE_ETL', schedule=schedule_etl) as etl_flow:
     raw_table = create_raw_table()
     parsed_table = create_parsed_table()
