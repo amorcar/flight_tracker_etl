@@ -8,6 +8,8 @@ def filter_duplicated_states(
         new_states: List[FlightState],
         stored_states: List[FlightState]
 ) -> List[FlightState]:
+    if not stored_states:
+        return new_states
 
     current_stored_icao24_codes = [state.icao24 for state in stored_states]
     def icao24_code_already_exist_condition(state: FlightState) -> bool:
@@ -36,12 +38,21 @@ def filter_duplicated_states(
 
     return [*filtered_states]
 
+
 def count_countries_of_origin(states: List[FlightState]) -> Counter:
     # 1 convert FlightState dataclass to dict
     dict_states = [*map(asdict, states)]
     # 2 count the different countries of origin
     counter = Counter([ state['origin_country'] for state in dict_states ])
     return counter
+
+
+from matplotlib import pyplot as plt
+def save_plot_countries_histogram(countries_count: dict):
+    plt.figure(figsize=(21, 11), dpi=120)
+    plt.xticks(rotation='vertical')
+    plt.bar(countries_count.keys(), countries_count.values())
+    plt.savefig('countries_count.png')
 
 
 if __name__ == '__main__':
@@ -77,5 +88,6 @@ if __name__ == '__main__':
     assert len(filtered), 1
 
     from pprint import pprint as pp
-    pp(count_countries_of_origin(filtered))
+    counts = count_countries_of_origin(filtered)
+    pp(counts)
 

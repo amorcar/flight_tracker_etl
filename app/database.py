@@ -111,6 +111,46 @@ def get_parsed_states_from_db(db):
 
     return [convert_to_bools(state) for state in flight_states]
 
+def create_country_count_table(db: str):
+    '''
+    Create a table to store the count of origin countries.
+    '''
+    script = 'CREATE TABLE IF NOT EXISTS countries (\
+        country TEXT,\
+        count INTEGER,\
+        UNIQUE (country)\
+        )'
+
+    with closing(sqlite3.connect(db)) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.execute(script)
+            conn.commit()
+
+def insert_countries_in_db(db: str, country_counts: dict):
+    first_script = 'INSERT OR IGNORE INTO countries VALUES (?, ?)'
+    second_script = 'UPDATE countries SET count = count + ? WHERE country=?;'
+    country_data = [*country_counts.items()]
+
+    def reverse(tuples):
+        new_tup = tuples[::-1]
+        return new_tup
+
+    with closing(sqlite3.connect(db)) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.executemany(first_script, [(c[0],0) for c in country_data])
+            cursor.executemany(second_script, [*map(reverse, country_data)])
+            conn.commit()
+
+def get_country_counts_from_db(db: str) -> dict:
+    script = 'SELECT * FROM countries'
+
+    with closing(sqlite3.connect(db)) as conn:
+        with closing(conn.cursor()) as cursor:
+            cursor.execute(script)
+            countries_count = cursor.fetchall()
+
+    countries_count_dict = {c: v for (c, v) in countries_count}
+    return countries_count_dict
 
 
 #TODO: change this for real unit testing
@@ -136,7 +176,6 @@ if __name__ == '__main__':
     insert_raw_states_in_db(db,flights)
     print('parsing states...')
     parsed_states = parse_flight_states(flights)
-    breakpoint()
     print(parsed_states[0])
     print('Storing in parsed db...')
     insert_parsed_states_in_db(db, parsed_states)
@@ -147,6 +186,14 @@ if __name__ == '__main__':
     print('First row:')
     print(restored_raw_rows[0])
     print(restored_parsed_rows[0])
+
+    create_country_count_table(db)
+    country_counts = {'Spain':2, 'USA':1}
+    insert_countries_in_db(db, country_counts)
+    country_counts = {'Spain':1, 'USA':4}
+    insert_countries_in_db(db, country_counts)
+    new_counts = get_country_counts_from_db(db)
+    assert new_counts['Spain'] == 3
 
     print('Removing DB file...')
     os.remove(db)
