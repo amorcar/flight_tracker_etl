@@ -58,6 +58,7 @@ with Flow('API_TRANSFORM_STORE_ETL', schedule=schedule_etl) as etl_flow:
     counts = transform_states_to_count_origin_countries(parsed_data)
     # Store the count of origin countries
     stored_counts = store_countries_count(counts, db=DB_FILE)
+    stored_counts.set_upstream(countries_table)
 
 
     #TODO: Separate this into a different flow
