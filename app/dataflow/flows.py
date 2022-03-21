@@ -64,6 +64,7 @@ with Flow('API_TRANSFORM_STORE_ETL', schedule=schedule_etl) as etl_flow:
     # Retrieve countries count from DB
     retrieved_counts = retrieve_countries_count()
     retrieved_counts.set_upstream(stored_counts)
+    retrieved_counts.set_upstream(countries_table)
     # Transform retrieved tuples to Count(dict) type
     count_dict = transform_count_tuples_to_dict(retrieved_counts)
     # Create histogram from data dict
